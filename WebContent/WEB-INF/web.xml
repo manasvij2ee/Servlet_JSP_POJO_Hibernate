@@ -8,12 +8,12 @@
  
   <servlet>
     <servlet-name>UserRegistrationServlet</servlet-name>
-    <servlet-class>com.home.UserRegistrationServlet</servlet-class>
+    <servlet-class>com.home.client.UserRegistrationServlet</servlet-class>
   </servlet>
   
   <servlet>
     <servlet-name>ViewUserRegistration</servlet-name>
-    <servlet-class>com.home.ViewUserRegistration</servlet-class>
+    <servlet-class>com.home.client.ViewUserRegistration</servlet-class>
   </servlet>
 
   <servlet-mapping>
