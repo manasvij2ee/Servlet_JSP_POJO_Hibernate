@@ -8,7 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.home.client.util.SystemUtil;
+import com.home.util.SystemUtil;
+import com.home.exception.UserAlreadyExistsException;
+import com.home.service.UserRegistrationService;
+import com.home.service.UserRegistrationServiceImpl;
+import com.home.service.dto.UserDTO;
+import com.home.service.entity.User;
 
 public class UserRegistrationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -24,36 +29,55 @@ public class UserRegistrationServlet extends HttpServlet {
 		String emailId = request.getParameter("emailId");
 		String password = request.getParameter("password");
 		String confirmPassword = request.getParameter("confirmPassword");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String gender = request.getParameter("gender");
+		String phoneNumber = request.getParameter("phoneNumber");
+		String firmName = request.getParameter("firmName");
+		String salary = request.getParameter("salary");
+		
+		
 		boolean isEverythingOk = false;
-		isEverythingOk = SystemUtil.emailRegExpValidation(emailId) && SystemUtil.passwordValidation(password, confirmPassword);
+		
+		// Server side Validations in Client Layer.
+		isEverythingOk = SystemUtil.emailRegExpValidation(emailId) && SystemUtil.passwordValidation(password, confirmPassword) && 
+				SystemUtil.nullAndblankValidation(emailId, password, confirmPassword, firstName, lastName, gender, phoneNumber, firmName, salary);
 		
 		if(isEverythingOk) {
-			String firstName = request.getParameter("firstName");
-			String lastName = request.getParameter("lastName");
-			String gender = request.getParameter("gender");
-			String phoneNumber = request.getParameter("phoneNumber");
-			String firmName = request.getParameter("firmName");
-			String salary = request.getParameter("salary");
 			
-			request.setAttribute("emailId", emailId);
-			request.setAttribute("password", password);
-			request.setAttribute("firstName", firstName);
-			request.setAttribute("lastName", lastName);
-			request.setAttribute("gender", gender);
-			request.setAttribute("phoneNumber", phoneNumber);
-			request.setAttribute("firmName", firmName);
-			request.setAttribute("salary", salary);
+			UserRegistrationService userRegistrationService = new UserRegistrationServiceImpl();//create service layer to call service from client layer 
+			User user=new User();
+			user.setEmailId(emailId);
+			user.setPassword(password);
+			user.setFirstName(firstName);
+			user.setLastName(lastName);
+			user.setGender(gender);
+			user.setPhoneNumber(phoneNumber);
+			user.setFirmName(firmName);
+			user.setSalary(Double.parseDouble(salary));     //Typecast From String to Double			
 			
+			//1.User, 2. user set all the instance variables			
+			try {
+				UserDTO userDTO = userRegistrationService.registerUser(user); 
+				request.setAttribute("userDTO", userDTO);
+			} catch (UserAlreadyExistsException e) {
+				request.setAttribute("errorMessage", e.getErrorMessage());
+				nextJSP = "/WEB-INF/view/userRegistration.jsp";
+			}			
 			dispatcher = getServletContext().getRequestDispatcher(nextJSP);
 			dispatcher.forward(request,response);						
-		} else {			
+		} else {
+			
 			String errorMessage = "";
+			if(!SystemUtil.nullAndblankValidation(emailId, password, confirmPassword, firstName, lastName, gender, phoneNumber, firmName, salary)) {
+				errorMessage = errorMessage.concat("\n Password and Confirm Password Does Not Match !");
+			}			
 			if(!SystemUtil.emailRegExpValidation(emailId)) {
-				errorMessage = "Invalid Email Id!";
+				errorMessage = "\n Invalid Email Id!";
 			}			
 			if(!SystemUtil.passwordValidation(password, confirmPassword)) {
 				errorMessage = errorMessage.concat("\n Password and Confirm Password Does Not Match !");
-			}			
+			}						
 			request.setAttribute("errorMessage", errorMessage);
 			nextJSP = "/WEB-INF/view/userRegistration.jsp";
 			dispatcher = getServletContext().getRequestDispatcher(nextJSP);
