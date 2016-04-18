@@ -1,10 +1,15 @@
 package com.home.util;
 
+import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.jasypt.util.text.BasicTextEncryptor;
 
+import com.home.dao.UserDaoImpl;
 import com.home.service.entity.Gender;
 import com.home.service.entity.User;
 
@@ -120,11 +125,15 @@ public class SystemUtil {
 	    double aDouble = Double.parseDouble(sal);
 		return  aDouble ;
 	}
-	
+	static Logger logger= Logger.getLogger(SystemUtil.class);
 	public  static void main(String[] args) {
+		/*PropertyConfigurator.configure("classpath:log4j.properties");
+		Enumeration  appenders = logger.getAllAppenders();*/
 		
-		String randomString = "sdvsdvsv";
-		System.out.println(checkForNotNullOrEmpty(randomString));
+		logger.debug("hi");
+		
+		//String randomString = "sdvsdvsv";
+		//System.out.println(checkForNotNullOrEmpty(randomString));
 		
 	}
 	

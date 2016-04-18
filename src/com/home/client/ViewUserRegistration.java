@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ViewUserRegistration extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
+  
 	public ViewUserRegistration() {
 	}
 

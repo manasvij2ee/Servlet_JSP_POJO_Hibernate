@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import com.home.util.SystemUtil;
 import com.home.exception.UserAlreadyExistsException;
 import com.home.service.UserRegistrationService;
@@ -17,6 +19,7 @@ import com.home.service.entity.User;
 
 public class UserRegistrationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	static Logger logger= Logger.getLogger(UserRegistrationServlet.class);
 
 	public UserRegistrationServlet() {
 	}
@@ -24,7 +27,8 @@ public class UserRegistrationServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
-		String nextJSP = "/WEB-INF/view/printUserDetails.jsp";		
+		String nextJSP = "/WEB-INF/view/printUserDetails.jsp";	
+		logger.debug("requesting parameters");
 		RequestDispatcher dispatcher = null;
 		String emailId = request.getParameter("emailId");
 		String password = request.getParameter("password");
@@ -38,12 +42,14 @@ public class UserRegistrationServlet extends HttpServlet {
 		
 		
 		boolean isEverythingOk = false;
+		logger.debug("validating the parameters");
 		
 		// Server side Validations in Client Layer.
 		isEverythingOk = SystemUtil.emailRegExpValidation(emailId) && SystemUtil.passwordValidation(password, confirmPassword) && 
 				SystemUtil.nullAndblankValidation(emailId, password, confirmPassword, firstName, lastName, gender, phoneNumber, firmName, salary);
 		
 		if(isEverythingOk) {
+			logger.debug("validation success");
 			
 			UserRegistrationService userRegistrationService = new UserRegistrationServiceImpl();//create service layer to call service from client layer 
 			User user=new User();
@@ -67,6 +73,7 @@ public class UserRegistrationServlet extends HttpServlet {
 			dispatcher = getServletContext().getRequestDispatcher(nextJSP);
 			dispatcher.forward(request,response);						
 		} else {
+			logger.debug("Validation Error occurred");
 			
 			String errorMessage = "";
 			if(!SystemUtil.nullAndblankValidation(emailId, password, confirmPassword, firstName, lastName, gender, phoneNumber, firmName, salary)) {
@@ -74,14 +81,16 @@ public class UserRegistrationServlet extends HttpServlet {
 			}			
 			if(!SystemUtil.emailRegExpValidation(emailId)) {
 				errorMessage = "\n Invalid Email Id!";
-			}			
+			}		
 			if(!SystemUtil.passwordValidation(password, confirmPassword)) {
 				errorMessage = errorMessage.concat("\n Password and Confirm Password Does Not Match !");
 			}						
 			request.setAttribute("errorMessage", errorMessage);
 			nextJSP = "/WEB-INF/view/userRegistration.jsp";
+				
 			dispatcher = getServletContext().getRequestDispatcher(nextJSP);
-			dispatcher.forward(request,response);			
+			dispatcher.forward(request,response);
+			logger.debug("Redirecting to Registration page after Error Encountered");
 		}
 	}
 

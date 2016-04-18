@@ -2,37 +2,45 @@ package com.home.dao;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-
 import com.home.service.entity.Gender;
 import com.home.service.entity.User;
 import com.home.util.SystemUtil;
 
 public class UserDaoImpl implements UserDao {
+	static Logger logger= Logger.getLogger(UserDaoImpl.class);
 	public static Session getSession() {
 		Session session;
 		SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 		session = sessionFactory.openSession();
-		System.out.println(" Connection Established Successfully");
+		logger.debug(" Connection Established Successfully");
 		return session;
 	}
 
 	public void saveUser(User userInfo) {
+		logger.debug("Inside saveUser()  Of UserDAOImpl user: " + userInfo);
 		Session session = getSession();
+		logger.debug("Session Established.. Trying to begin Transaction");
 		session.beginTransaction();
 		session.saveOrUpdate(userInfo);
 		session.getTransaction().commit();
+		logger.info("User Saved successfully..");
 	}
 
 	public User retrieveUserById(int id) {
 		Session session = getSession();
+		logger.debug("Session Established.. Trying to begin Transaction");
 		session.beginTransaction();
 		User userInfo = (User) session.get(User.class, id);
 		session.getTransaction().commit();
+		logger.info("User Retrieved  successfully..");
 		return userInfo;
+		
+		
 	}
 	public User loadUserByEmailNamedQuery(String emailId){
 		User user = null;
@@ -72,12 +80,15 @@ public class UserDaoImpl implements UserDao {
 			user.setCreatedBy(createdBy);
 			user.setSalary(salary);
 			user.setModifiedBy(modifiedBy);
+			logger.info("User Loaded successfully..");
 				}
 		return user;
+		
 		
 	}
 	
 	public User loadUserByEmailNamedNativeQuery(String emailId){
+		logger.debug("inside loadUserByEmailNamedQuery ");
 		User user = null;
 		Session session = getSession();
 		session.beginTransaction();
@@ -123,6 +134,7 @@ public class UserDaoImpl implements UserDao {
 	
 	
 	public User loadUserByEmailSql(String emailId) {
+		logger.debug("inside loadUserByEmailSql ");
 		User user = null;
 		Session session = getSession();
 		session.beginTransaction();
@@ -170,6 +182,7 @@ public class UserDaoImpl implements UserDao {
 	
 	
 	public User loadUserByEmailHql(String emailId) {
+		logger.debug("inside loadUserByEmailHql ");
 		User user = null;
 		Session session = getSession();
 		session.beginTransaction();
